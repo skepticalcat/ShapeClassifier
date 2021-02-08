@@ -1,6 +1,7 @@
 import os
 import cv2
 import pickle
+import numpy as np
 
 def raw_shapes_to_edges():
     data = []
@@ -8,6 +9,9 @@ def raw_shapes_to_edges():
         path_orig = os.path.join("H:/shapes/output",elem)
         img = cv2.imread(path_orig, cv2.IMREAD_COLOR)
         edges = cv2.Canny(img, 100, 200)
+        kernel = np.ones((2, 2), np.uint8)
+        edges = cv2.dilate(edges, kernel, iterations=2)
+        #cv2.imwrite("test.png",edges)
         data.append((elem.split("_")[0].lower(),edges))
     return data
 

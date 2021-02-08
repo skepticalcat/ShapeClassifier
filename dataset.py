@@ -12,6 +12,16 @@ class ShapeDataset(Dataset):
         with open("data.pickle", "rb") as handle:
             self.examples = pickle.load(handle)
         self.transform = transform
+        self.classes = {'pentagon': 0,
+                        'circle': 1,
+                        'nonagon': 2,
+                        'triangle': 3,
+                        'octagon': 4,
+                        'square': 5,
+                        'heptagon': 6,
+                        'hexagon': 7,
+                        'star': 8}
+
 
     def __len__(self):
         return len(self.examples)
@@ -19,9 +29,12 @@ class ShapeDataset(Dataset):
     def __getitem__(self, idx):
         if torch.is_tensor(idx):
             idx = idx.tolist()
-        image = Image.fromarray(self.examples[idx][1],'L')
-        tensor_image = self.transform(image)
-        sample = {"labels": self.examples[idx][0], "picture": tensor_image}
+        tensor_image = torch.from_numpy(self.examples[idx][1]).float()
+        tensor_image.unsqueeze_(0)
+        #tensor_image = self.transform(tensor_image)
+        #torch.set_printoptions(profile="full")
+        #print(tensor_image)
+        sample = {"label": self.classes[self.examples[idx][0]], "picture": tensor_image}
         return sample
 
     def train_test_dataset(self, test_split=0.25, val_split=0.1):
