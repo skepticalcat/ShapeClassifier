@@ -7,18 +7,15 @@ from TestValidate import TestValidate
 from dataset import ShapeDataset
 from model import ShapesCNN
 
-transform = transforms.Compose([transforms.Normalize((0.5), (0.5))])
-
-ds = ShapeDataset(transform)
-datasets = ds.train_test_dataset(0.2, 0.1)
-
-
-batch_size = 8
+batch_size = 256
 losses = []
 running_loss = 0
 val_counter = 0
-epochs = 4
+epochs = 8
 
+transform = transforms.Compose([transforms.Grayscale(num_output_channels=1), transforms.Resize(40), transforms.ToTensor(), transforms.Normalize((0,), (1,))])
+ds = ShapeDataset(transform)
+datasets = ds.train_test_dataset(0.2, 0.1)
 dataloaders = {x: DataLoader(datasets[x], batch_size, shuffle=True, num_workers=0, drop_last=True) for x in
                ['train', 'test', "val"]}
 
@@ -30,7 +27,7 @@ net = ShapesCNN()
 net.cuda()
 net.train()
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(net.parameters(), lr=0.001)  # , eps=0.001)
+optimizer = optim.Adam(net.parameters(), lr=0.001)
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 testval = TestValidate(device,batch_size,criterion,net)
 
@@ -55,7 +52,7 @@ for epoch in range(epochs):
             losses.append(running_loss / 10)
             print('[%d, %5d] loss: %.3f' % (epoch, i, losses[-1]))
             running_loss = 0.0
-        if val_counter % 500 == 0:
+        if val_counter % 100 == 0:
             testval.eval(dataloaders["val"])
 
 testval.eval(dataloaders["test"])
