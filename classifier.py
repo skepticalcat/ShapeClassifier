@@ -11,9 +11,9 @@ batch_size = 256
 losses = []
 running_loss = 0
 val_counter = 0
-epochs = 8
+epochs = 10
 
-transform = transforms.Compose([transforms.Grayscale(num_output_channels=1), transforms.Resize(40), transforms.ToTensor(), transforms.Normalize((0,), (1,))])
+transform = transforms.Compose([transforms.Grayscale(num_output_channels=1), transforms.Resize(100), transforms.ToTensor(), transforms.Normalize((0,), (1,))])
 ds = ShapeDataset(transform)
 datasets = ds.train_test_dataset(0.2, 0.1)
 dataloaders = {x: DataLoader(datasets[x], batch_size, shuffle=True, num_workers=0, drop_last=True) for x in

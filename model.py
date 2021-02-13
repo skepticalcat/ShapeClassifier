@@ -1,11 +1,9 @@
-import torch
 from torch import nn
 import torch.nn.functional as F
 
 class ShapesCNN(nn.Module):
     def __init__(self):
         super(ShapesCNN, self).__init__()
-
 
         self.conv1 = nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=2)
         self.pool1 = nn.MaxPool2d(kernel_size=4, stride=2)
@@ -14,12 +12,13 @@ class ShapesCNN(nn.Module):
         self.pool2 = nn.MaxPool2d(kernel_size=4, stride=2)
 
         self.conv3 = nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=2)
+        self.conv31 = nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=2)
         self.pool3 = nn.MaxPool2d(kernel_size=4, stride=2)
 
         self.conv4 = nn.Conv2d(128, 196, kernel_size=3, stride=1, padding=2)
         self.pool4 = nn.MaxPool2d(kernel_size=4, stride=2)
 
-        self.fc1 = nn.Linear(784, 2048)
+        self.fc1 = nn.Linear(7056, 2048)
         self.fc2 = nn.Linear(2048, 9)
 
         self.drop = nn.Dropout(0.2)
@@ -32,6 +31,7 @@ class ShapesCNN(nn.Module):
         x = self.pool2(x)
 
         x = F.relu(self.conv3(x))
+        x = F.relu(self.conv31(x))
         x = self.pool3(x)
 
         x = F.relu(self.conv4(x))
