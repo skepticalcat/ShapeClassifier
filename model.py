@@ -37,7 +37,6 @@ class ShapesCNN(nn.Module):
         x = F.relu(self.conv4(x))
         x = self.pool4(x)
 
-
         x = x.reshape(x.size(0), -1)
         x = self.drop(x)
         x = F.relu(self.fc1(x))
