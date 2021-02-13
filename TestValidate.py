@@ -1,5 +1,7 @@
 import torch
 import numpy as np
+from sklearn.metrics import precision_recall_fscore_support
+
 
 class TestValidate:
 
@@ -22,8 +24,11 @@ class TestValidate:
             t_total = 0
             total_per_mode = [0] * 9
             correct_per_mode = [0] * 9
-
             val_losses = []
+
+            all_labels = []
+            all_predicted = []
+
             for i, data in enumerate(dataloader):
                 inputs, labels = data["picture"], data["label"]
                 inputs = inputs.to(self.device)
@@ -33,6 +38,9 @@ class TestValidate:
                 loss = self.criterion(outputs.view(self.batch_size, -1), labels)
                 val_losses.append(loss.item())
                 predicted = score_to_modality(outputs.view(self.batch_size, -1))
+
+                all_labels.extend(labels)
+                all_predicted.extend(predicted)
 
                 for o, elem in enumerate(predicted):
                     total_per_mode[int(labels[o])] += 1
@@ -47,11 +55,14 @@ class TestValidate:
                     mode_statistics.append(0)
                     continue
                 mode_statistics.append(1 / (total_per_mode[k] / correct_per_mode[k]))
+            all_labels = [int(x) for x in all_labels]
+            precision, recall, fbeta, _ = precision_recall_fscore_support(all_labels,all_predicted,average='macro')
 
             print('Accuracy: %d %%' % (100 * t_correct / t_total))
             print("Loss: {:.6f}".format(np.mean(val_losses)))
             print("Mode-correct:")
             print(total_per_mode)
             print(mode_statistics)
+            print("Precision: {:.3f}, Recall: {:.3f}, F-beta: {:.3f}".format(precision,recall,fbeta))
 
 
